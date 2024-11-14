@@ -1,5 +1,5 @@
-import { TodoCard } from "./TodoCard";
 import { useState } from "react";
+
 export function TodoInput(props){
     const {handleAddTodo} = props
     const [inputValue, setInputValue] = useState('')
