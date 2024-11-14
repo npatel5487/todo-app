@@ -2,7 +2,7 @@ import { Header } from "./components/Header"
 import { Tabs } from "./components/Tabs"
 import { TodoInput } from "./components/TodoInput"
 import { TodoList } from "./components/ToDoList"
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 
 function App() {
   // const todos = [
@@ -13,27 +13,49 @@ function App() {
   // ]
   const [todos, setTodos] = useState([{input: 'Hello! Add your first todo!', complete: true}
   ])
+  const [selectedTab, setSelectedTab] = useState('Open')
 
   function handleAddTodo(newTodo){
     const newTodoList = [...todos, {input:newTodo, complete: false}]
     setTodos(newTodoList)
-
+    handleSaveData(newTodoList)
 
   }
   
-  function handleEditTodo(){
-
+  function handleCompleteTodo(index){
+    //update/edit/modify
+    let newTodoList = [...todos]
+    let completedTodos = todos[index]
+    completedTodos['complete'] = true
+    newTodoList[index] = completedTodos
+    setTodos(newTodoList)
+    handleSaveData(newTodoList)
   }
 
-  function handleDeleteTodo(){
-
+  function handleDeleteTodo(index){
+    let newTodoList = todos.filter((val,valIndex) => {
+      return valIndex !== index
+    })
+    setTodos(newTodoList)
+    handleSaveData(newTodoList)
   }
+
+  function handleSaveData(currTodos) {
+    localStorage.setItem('todo-app', JSON.stringify({todos:currTodos}))
+
+   }
+
+  useEffect(()=> {
+    if (!localStorage || !localStorage.getItem('todo-app')) { return }
+    let db = JSON.parse(localStorage.getItem('todo-app'))
+    setTodos(db.setTodos)
+  }, [])
 
   return (
     <>
       <Header todos={todos} />
-      <Tabs todos={todos} />
-      <TodoList todos={todos} />
+      <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} todos={todos} />
+      <TodoList handleCompleteTodo={handleCompleteTodo} handleDeleteTodo={handleDeleteTodo} selectedTab={selectedTab} todos={todos} />
       <TodoInput handleAddTodo={handleAddTodo} />
     </>
   )
